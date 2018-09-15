@@ -7,6 +7,7 @@ import com.pratamawijaya.demomvp.data.model.response.ArticleResponse
 import com.pratamawijaya.demomvp.domain.Article
 import io.reactivex.Single
 import java.net.URL
+import java.util.*
 
 class ArticleRepositoryImpl : ArticleRepository {
 
@@ -50,7 +51,8 @@ class ArticleRepositoryImpl : ArticleRepository {
                 title = model.title,
                 image = model.urlToImage ?: "",
                 desc = model.description,
-                author = model.author
+                author = model.author,
+                date = Date()
         )
     }
 }

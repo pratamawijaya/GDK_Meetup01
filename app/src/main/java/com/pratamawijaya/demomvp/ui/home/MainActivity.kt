@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.pratamawijaya.demomvp.R
+import com.pratamawijaya.demomvp.data.PrefHelper
 import com.pratamawijaya.demomvp.data.repository.ArticleRepositoryImpl
 import com.pratamawijaya.demomvp.data.repository.UserRepositoryImpl
 import com.pratamawijaya.demomvp.domain.Article
@@ -21,9 +22,10 @@ class MainActivity : AppCompatActivity(), MainView, MainListener {
         val repo = UserRepositoryImpl()
         val articleRepo = ArticleRepositoryImpl()
         val adapter = MainAdapter(this)
+        val prefHelper = PrefHelper(this)
 
         // inisiasi presenter
-        presenter = MainPresenter(this, repo, articleRepo)
+        presenter = MainPresenter(this, repo, articleRepo, prefHelper)
 
         presenter.getUser()
         presenter.getArticles()
