@@ -1,19 +1,30 @@
 package com.pratamawijaya.demomvp.ui.home
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.support.v7.widget.LinearLayoutManager
 import com.pratamawijaya.demomvp.R
 import com.pratamawijaya.demomvp.data.PrefHelper
 import com.pratamawijaya.demomvp.data.repository.ArticleRepositoryImpl
 import com.pratamawijaya.demomvp.data.repository.UserRepositoryImpl
 import com.pratamawijaya.demomvp.domain.Article
-import com.pratamawijaya.demomvp.domain.User
+import com.pratamawijaya.demomvp.ui.home.item.ArticleAnother
+import com.pratamawijaya.demomvp.ui.home.item.ArticleHorizontalItem
+import com.pratamawijaya.demomvp.ui.home.item.ArticleItem
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.ViewHolder
+import kotlinx.android.synthetic.main.activity_main.rvArticle
 
-class MainActivity : AppCompatActivity(), MainView, MainListener {
+class MainActivity : AppCompatActivity() {
 
     // declare presenter
     lateinit var presenter: MainPresenter
+
+    lateinit var vm: MainViewModel
+
+    private var articleAdapter = GroupAdapter<ViewHolder>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,31 +32,29 @@ class MainActivity : AppCompatActivity(), MainView, MainListener {
 
         val repo = UserRepositoryImpl()
         val articleRepo = ArticleRepositoryImpl()
-        val adapter = MainAdapter(this)
         val prefHelper = PrefHelper(this)
 
-        // inisiasi presenter
-        presenter = MainPresenter(this, repo, articleRepo, prefHelper)
+        vm = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        vm.articleLiveData.observe(this, observer)
 
-        presenter.getUser()
-        presenter.getArticles()
+        vm.getArticle()
+
+        rvArticle.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = articleAdapter
+        }
+
     }
 
-    override fun onItemClick(article: Article) {
-        // do something with article
-        // presenter.updateArticle(article)
+    val observer = Observer<List<Article>> { data ->
+        data?.map {
+            articleAdapter.add(ArticleItem(it))
+        }
+        val horizontalAdpter = GroupAdapter<ViewHolder>()
+        data?.map {
+            horizontalAdpter.add(ArticleAnother(it))
+        }
+        articleAdapter.add(ArticleHorizontalItem(horizontalAdpter))
     }
-
-    override fun showLoading() {
-    }
-
-    override fun hideLoading() {
-    }
-
-    override fun showUserData(user: User) {
-        // do something to user
-        Log.d("tag", "user ${user.nama}")
-    }
-
 
 }

@@ -25,6 +25,7 @@ class MainPresenter(val view: MainView,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
                     prefHelper.saveString(PrefHelper.PREF_TOKEN, "isi_token")
+//                    view.showArticles(result)
                     result.map {
                         Log.d("tag", "dapet article -> ${it.title}")
                     }
