@@ -5,8 +5,10 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import com.pratamawijaya.demomvp.R
 import com.pratamawijaya.demomvp.data.PrefHelper
+import com.pratamawijaya.demomvp.data.model.TeamModel
 import com.pratamawijaya.demomvp.data.repository.ArticleRepositoryImpl
 import com.pratamawijaya.demomvp.data.repository.UserRepositoryImpl
 import com.pratamawijaya.demomvp.domain.Article
@@ -37,13 +39,45 @@ class MainActivity : AppCompatActivity() {
         vm = ViewModelProviders.of(this).get(MainViewModel::class.java)
         vm.articleLiveData.observe(this, observer)
 
-        vm.getArticle()
+
+        vm.mainState.observe(this, stateObserver)
+        vm.getTeams()
+
+//        vm.getArticle()
 
         rvArticle.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = articleAdapter
         }
 
+    }
+
+    val stateObserver = Observer<MainState> { state ->
+
+        when (state) {
+            is LoadingState -> {
+                // ngapain
+                Log.d("tag", "loading")
+            }
+
+            is ErrorState -> {
+                // ngapain
+                Log.d("tag", "error ${state.msg}")
+            }
+
+            is TeamLoaded -> {
+                state.teams.map {
+                    Log.d("tag", "datanya ${it.idTeam}")
+                }
+            }
+        }
+
+    }
+
+    val listTeamObserver = Observer<List<TeamModel>> { teams ->
+        teams?.map {
+            Log.d("data", "data team $it.str")
+        }
     }
 
     val observer = Observer<List<Article>> { data ->

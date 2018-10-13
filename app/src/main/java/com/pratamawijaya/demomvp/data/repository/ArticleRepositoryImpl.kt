@@ -3,6 +3,8 @@ package com.pratamawijaya.demomvp.data.repository
 import android.util.Log
 import com.google.gson.Gson
 import com.pratamawijaya.demomvp.data.model.ArticleModel
+import com.pratamawijaya.demomvp.data.model.TeamModel
+import com.pratamawijaya.demomvp.data.model.response.AllTeamResponse
 import com.pratamawijaya.demomvp.data.model.response.ArticleResponse
 import com.pratamawijaya.demomvp.domain.Article
 import io.reactivex.Single
@@ -41,6 +43,30 @@ class ArticleRepositoryImpl : ArticleRepository {
 
         }
 
+        return single
+    }
+
+    override fun getAllTeams(leagueId: Int): Single<List<TeamModel>> {
+        val url = "https://www.thesportsdb.com/api/v1/json/1/lookup_all_teams.php?id=$leagueId"
+
+        val single = Single.create<List<TeamModel>> {
+            val responseString = URL(url).readText()
+            Log.d("tag", "hasil url $responseString")
+            // transform json string to pojo
+
+            try {
+                val teamResponse = Gson().fromJson(responseString, AllTeamResponse::class.java)
+                Log.d("tag", "response ${teamResponse.teams?.size}")
+
+                val team = mutableListOf<TeamModel>()
+                teamResponse.teams?.map {
+                    team.add(it)
+                }
+                it.onSuccess(team)
+            } catch (err: Exception) {
+                it.onError(err)
+            }
+        }
         return single
     }
 
